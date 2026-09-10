@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Quote</title>
+    <style>
+        :root {
+            --bg-color: #0a192f;       /* Blu Scuro Profondo */
+            --card-bg: #112240;        /* Blu Scuro leggermente più chiaro */
+            --accent-gold: #FFD700;    /* Oro */
+            --text-gold: #f0c674;      /* Oro tenue */
+            --border-gold: #b8860b;    /* Oro scuro */
+            --input-bg: #233554;       /* Sfondo input */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: var(--bg-color);
+            color: var(--text-gold);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Intestazione Importo */
+        .header-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--accent-gold);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .header-label {
+            background-color: var(--accent-gold);
+            color: var(--bg-color);
+            padding: 12px 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .header-input {
+            background-color: transparent;
+            border: none;
+            color: var(--accent-gold);
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            outline: none;
+            text-align: right;
+        }
+
+        /* Contenitore Tabella */
+        .table-container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Spazio tra le righe */
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr; /* 3 Colonne: Pulsante, Quota, Risultato */
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Stile Pulsanti Quota */
+        button.btn-quota {
+            width: 100%;
+            padding: 12px 5px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        button.btn-quota:active {
+            background-color: var(--accent-gold);
+            color: var(--bg-color);
+        }
+
+        /* Stile Display Quota (colonna centrale) */
+        .quota-display {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-gold);
+            color: var(--accent-gold);
+            padding: 12px 5px;
+            font-size: 16px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* Stile Display Risultato (colonna destra) */
+        .result-display {
+            background-color: var(--input-bg);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 12px 5px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 6px;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Pulsante Reset */
+        .reset-btn {
+            margin-top: 40px;
+            background-color: transparent;
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            padding: 12px;
+            font-size: 14px;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:active {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Input Importo Totale -->
+    <div class="header-container">
+        <div class="header-label">Importo:</div>
+        <input type="number" id="totalAmount" class="header-input" placeholder="0" value="100" inputmode="decimal">
+        <div style="padding: 10px; color: var(--accent-gold); font-weight:bold;">€</div>
+    </div>
+
+    <!-- Tabella Calcoli -->
+    <div class="table-container">
+        
+        <!-- Riga 1 -->
+        <div class="row">
+            <button class="btn-quota" onclick="chiediQuota(1)">Quota 1</button>
+            <div id="displayQuota1" class="quota-display">-</div>
+            <div id="risultato1" class="result-display">-</div>
+        </div>
+
+        <!-- Riga X -->
+        <div class="row">
+            <button class="btn-quota" onclick="chiediQuota('X')">Quota X</button>
+            <div id="displayQuotaX" class="quota-display">-</div>
+            <div id="risultatoX" class="result-display">-</div>
+        </div>
+
+        <!-- Riga 2 -->
+        <div class="row">
+            <button class="btn-quota" onclick="chiediQuota(2)">Quota 2</button>
+            <div id="displayQuota2" class="quota-display">-</div>
+            <div id="risultato2" class="result-display">-</div>
+        </div>
+
+    </div>
+
+    <!-- Pulsante Reset -->
+    <button class="reset-btn" onclick="resetCampi()">RESET / NUOVO CALCOLO</button>
+
+    <script>
+        // Funzione per chiedere la quota e calcolare
+        function chiediQuota(tipo) {
+            // 1. Prendi l'importo totale
+            const importoTotaleInput = document.getElementById('totalAmount').value;
+            
+            if (importoTotaleInput === "" || parseFloat(importoTotaleInput) <= 0) {
+                alert("Inserisci prima un Importo valido in alto!");
+                return;
+            }
+            const importoTotale = parseFloat(importoTotaleInput.replace(',', '.'));
+
+            // 2. Chiedi all'utente di inserire la quota
+            let quotaInput = prompt("Inserisci il valore per Quota " + tipo + ":");
+            
+            // Se l'utente annulla o lascia vuoto, interrompi
+            if (quotaInput === null || quotaInput.trim() === "") {
+                return;
+            }
+
+            // Sostituisci la virgola con il punto per il calcolo
+            quotaInput = quotaInput.replace(',', '.');
+            const quota = parseFloat(quotaInput);
+
+            // Validazione quota
+            if (isNaN(quota) || quota <= 0) {
+                alert("Per favore, inserisci un numero di quota valido (es. 1.85)");
+                return;
+            }
+
+            // 3. Calcola il Risultato (Importo / Quota)
+            const risultatoEsatto = importoTotale / quota;
+
+            // 4. Arrotonda per ECCESSO all'intero più vicino (Math.ceil)
+            const risultatoArrotondato = Math.ceil(risultatoEsatto);
+
+            // 5. Aggiorna l'interfaccia in base alla riga selezionata
+            let idDisplayQuota, idRisultato;
+            
+            if (tipo === 1) {
+                idDisplayQuota = 'displayQuota1';
+                idRisultato = 'risultato1';
+            } else if (tipo === 'X') {
+                idDisplayQuota = 'displayQuotaX';
+                idRisultato = 'risultatoX';
+            } else {
+                idDisplayQuota = 'displayQuota2';
+                idRisultato = 'risultato2';
+            }
+
+            // Mostra la quota inserita (formattata con 2 decimali)
+            document.getElementById(idDisplayQuota).innerText = quota.toFixed(2);
+            
+            // Mostra il risultato arrotondato per eccesso
+            document.getElementById(idRisultato).innerText = risultatoArrotondato;
+        }
+
+        // Funzione per resettare i campi
+        function resetCampi() {
+            // Svuota display quote
+            document.getElementById('displayQuota1').innerText = '-';
+            document.getElementById('displayQuotaX').innerText = '-';
+            document.getElementById('displayQuota2').innerText = '-';
+            
+            // Resetta risultati
+            document.getElementById('risultato1').innerText = '-';
+            document.getElementById('risultatoX').innerText = '-';
+            document.getElementById('risultato2').innerText = '-';
+            
+            // Opzionale: riporta l'importo a 100 o svuotalo
+            // document.getElementById('totalAmount').value = '100'; 
+        }
+    </script>
+</body>
+</html>
