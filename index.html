@@ -2,28 +2,59 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a192f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Calcolatore Quote">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Calcolatore Quote</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
     <style>
         :root {
-            --bg-color: #0a192f;       /* Blu Scuro Profondo */
-            --card-bg: #112240;        /* Blu Scuro leggermente più chiaro */
-            --accent-gold: #FFD700;    /* Oro */
-            --text-gold: #f0c674;      /* Oro tenue */
-            --border-gold: #b8860b;    /* Oro scuro */
-            --input-bg: #233554;       /* Sfondo input */
+            --bg-color: #0a192f;
+            --card-bg: #112240;
+            --accent-gold: #FFD700;
+            --text-gold: #f0c674;
+            --border-gold: #b8860b;
+            --input-bg: #233554;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 15px;
             background-color: var(--bg-color);
             color: var(--text-gold);
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center; /* centratura verticale */
             min-height: 100vh;
+            min-height: 100dvh; /* mobile moderno */
+            padding: 15px;
+            padding-top: env(safe-area-inset-top, 15px);
+            padding-bottom: env(safe-area-inset-bottom, 15px);
+            overflow-x: hidden;
+        }
+
+        /* Wrapper per centrare il contenuto */
+        .app-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 500px;
+            margin: auto;
         }
 
         /* Intestazione Importo */
@@ -46,6 +77,7 @@
             padding: 12px 15px;
             font-weight: bold;
             font-size: 16px;
+            white-space: nowrap;
         }
 
         .header-input {
@@ -58,6 +90,7 @@
             width: 100%;
             outline: none;
             text-align: right;
+            min-width: 0;
         }
 
         /* Contenitore Tabella */
@@ -66,17 +99,16 @@
             max-width: 400px;
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Spazio tra le righe */
+            gap: 15px;
         }
 
         .row {
             display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr; /* 3 Colonne: Pulsante, Quota, Risultato */
+            grid-template-columns: 1.2fr 1fr 1fr;
             gap: 10px;
             align-items: center;
         }
 
-        /* Stile Pulsanti Quota */
         button.btn-quota {
             width: 100%;
             padding: 12px 5px;
@@ -90,6 +122,7 @@
             font-size: 14px;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            -webkit-tap-highlight-color: transparent;
         }
 
         button.btn-quota:active {
@@ -97,7 +130,6 @@
             color: var(--bg-color);
         }
 
-        /* Stile Display Quota (colonna centrale) */
         .quota-display {
             background-color: var(--input-bg);
             border: 1px solid var(--border-gold);
@@ -109,7 +141,6 @@
             font-weight: bold;
         }
 
-        /* Stile Display Risultato (colonna destra) */
         .result-display {
             background-color: var(--input-bg);
             border: 1px solid var(--accent-gold);
@@ -122,7 +153,6 @@
             text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
         }
 
-        /* Pulsante Reset */
         .reset-btn {
             margin-top: 40px;
             background-color: transparent;
@@ -136,6 +166,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .reset-btn:active {
@@ -143,85 +174,137 @@
             color: white;
         }
 
+        /* ORIENTAMENTO ORIZZONTALE: layout più compatto */
+        @media (orientation: landscape) and (max-height: 500px) {
+            body {
+                justify-content: center;
+                padding: 10px;
+            }
+
+            .app-wrapper {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+                gap: 15px;
+                max-width: 100%;
+            }
+
+            .header-container {
+                margin-bottom: 0;
+                max-width: 220px;
+                order: 1;
+            }
+
+            .header-label {
+                padding: 10px 10px;
+                font-size: 14px;
+            }
+
+            .header-input {
+                padding: 10px 8px;
+                font-size: 16px;
+            }
+
+            .table-container {
+                max-width: 400px;
+                order: 2;
+                gap: 8px;
+            }
+
+            .row {
+                gap: 8px;
+            }
+
+            button.btn-quota,
+            .quota-display,
+            .result-display {
+                padding: 8px 4px;
+                font-size: 13px;
+            }
+
+            .result-display {
+                font-size: 15px;
+            }
+
+            .reset-btn {
+                margin-top: 0;
+                max-width: 220px;
+                padding: 10px;
+                order: 3;
+                align-self: center;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Input Importo Totale -->
-    <div class="header-container">
-        <div class="header-label">Importo:</div>
-        <input type="number" id="totalAmount" class="header-input" placeholder="0" value="100" inputmode="decimal">
-        <div style="padding: 10px; color: var(--accent-gold); font-weight:bold;">€</div>
+    <div class="app-wrapper">
+
+        <!-- Input Importo Totale -->
+        <div class="header-container">
+            <div class="header-label">Importo:</div>
+            <input type="number" id="totalAmount" class="header-input" placeholder="0" value="100" inputmode="decimal">
+            <div style="padding: 10px; color: var(--accent-gold); font-weight:bold;">€</div>
+        </div>
+
+        <!-- Tabella Calcoli -->
+        <div class="table-container">
+
+            <div class="row">
+                <button class="btn-quota" onclick="chiediQuota(1)">Quota 1</button>
+                <div id="displayQuota1" class="quota-display">-</div>
+                <div id="risultato1" class="result-display">-</div>
+            </div>
+
+            <div class="row">
+                <button class="btn-quota" onclick="chiediQuota('X')">Quota X</button>
+                <div id="displayQuotaX" class="quota-display">-</div>
+                <div id="risultatoX" class="result-display">-</div>
+            </div>
+
+            <div class="row">
+                <button class="btn-quota" onclick="chiediQuota(2)">Quota 2</button>
+                <div id="displayQuota2" class="quota-display">-</div>
+                <div id="risultato2" class="result-display">-</div>
+            </div>
+
+        </div>
+
+        <!-- Pulsante Reset -->
+        <button class="reset-btn" onclick="resetCampi()">RESET / NUOVO CALCOLO</button>
+
     </div>
-
-    <!-- Tabella Calcoli -->
-    <div class="table-container">
-        
-        <!-- Riga 1 -->
-        <div class="row">
-            <button class="btn-quota" onclick="chiediQuota(1)">Quota 1</button>
-            <div id="displayQuota1" class="quota-display">-</div>
-            <div id="risultato1" class="result-display">-</div>
-        </div>
-
-        <!-- Riga X -->
-        <div class="row">
-            <button class="btn-quota" onclick="chiediQuota('X')">Quota X</button>
-            <div id="displayQuotaX" class="quota-display">-</div>
-            <div id="risultatoX" class="result-display">-</div>
-        </div>
-
-        <!-- Riga 2 -->
-        <div class="row">
-            <button class="btn-quota" onclick="chiediQuota(2)">Quota 2</button>
-            <div id="displayQuota2" class="quota-display">-</div>
-            <div id="risultato2" class="result-display">-</div>
-        </div>
-
-    </div>
-
-    <!-- Pulsante Reset -->
-    <button class="reset-btn" onclick="resetCampi()">RESET / NUOVO CALCOLO</button>
 
     <script>
-        // Funzione per chiedere la quota e calcolare
         function chiediQuota(tipo) {
-            // 1. Prendi l'importo totale
             const importoTotaleInput = document.getElementById('totalAmount').value;
-            
+
             if (importoTotaleInput === "" || parseFloat(importoTotaleInput) <= 0) {
                 alert("Inserisci prima un Importo valido in alto!");
                 return;
             }
             const importoTotale = parseFloat(importoTotaleInput.replace(',', '.'));
 
-            // 2. Chiedi all'utente di inserire la quota
             let quotaInput = prompt("Inserisci il valore per Quota " + tipo + ":");
-            
-            // Se l'utente annulla o lascia vuoto, interrompi
+
             if (quotaInput === null || quotaInput.trim() === "") {
                 return;
             }
 
-            // Sostituisci la virgola con il punto per il calcolo
             quotaInput = quotaInput.replace(',', '.');
             const quota = parseFloat(quotaInput);
 
-            // Validazione quota
             if (isNaN(quota) || quota <= 0) {
                 alert("Per favore, inserisci un numero di quota valido (es. 1.85)");
                 return;
             }
 
-            // 3. Calcola il Risultato (Importo / Quota)
             const risultatoEsatto = importoTotale / quota;
-
-            // 4. Arrotonda per ECCESSO all'intero più vicino (Math.ceil)
             const risultatoArrotondato = Math.ceil(risultatoEsatto);
 
-            // 5. Aggiorna l'interfaccia in base alla riga selezionata
             let idDisplayQuota, idRisultato;
-            
+
             if (tipo === 1) {
                 idDisplayQuota = 'displayQuota1';
                 idRisultato = 'risultato1';
@@ -233,27 +316,27 @@
                 idRisultato = 'risultato2';
             }
 
-            // Mostra la quota inserita (formattata con 2 decimali)
             document.getElementById(idDisplayQuota).innerText = quota.toFixed(2);
-            
-            // Mostra il risultato arrotondato per eccesso
             document.getElementById(idRisultato).innerText = risultatoArrotondato;
         }
 
-        // Funzione per resettare i campi
         function resetCampi() {
-            // Svuota display quote
             document.getElementById('displayQuota1').innerText = '-';
             document.getElementById('displayQuotaX').innerText = '-';
             document.getElementById('displayQuota2').innerText = '-';
-            
-            // Resetta risultati
+
             document.getElementById('risultato1').innerText = '-';
             document.getElementById('risultatoX').innerText = '-';
             document.getElementById('risultato2').innerText = '-';
-            
-            // Opzionale: riporta l'importo a 100 o svuotalo
-            // document.getElementById('totalAmount').value = '100'; 
+        }
+
+        // Registrazione Service Worker per PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registrato:', reg.scope))
+                    .catch(err => console.log('Errore Service Worker:', err));
+            });
         }
     </script>
 </body>
